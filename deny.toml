@@ -1,0 +1,196 @@
+[graph]
+all-features = false
+no-default-features = false
+#features = []
+
+# The output table provides options for how/if diagnostics are outputted
+[output]
+feature-depth = 1
+
+# This section is considered when running `cargo deny check advisories`
+# More documentation for the advisories section can be found here:
+# https://embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html
+[advisories]
+ignore = [
+    # This has been yanked, but upgrading to the next version breaks some WPT tests.
+    # It needs investigation.
+    "url@2.5.3",
+
+    # The crate `paste` is no longer maintained.
+    "RUSTSEC-2024-0436",
+]
+
+# This section is considered when running `cargo deny check licenses`
+# More documentation for the licenses section can be found here:
+# https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html
+[licenses]
+# List of explicitly allowed licenses
+# See https://spdx.org/licenses/ for list of possible licenses
+# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
+allow = [
+    "Apache-2.0 WITH LLVM-exception",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "CC0-1.0",
+    "CDLA-Permissive-2.0",
+    "ISC",
+    "MIT",
+    "MPL-2.0",
+    "OpenSSL",
+    "OFL-1.1",
+    "Ubuntu-font-1.0",
+    "Unicode-3.0",
+    "Zlib",
+]
+# The confidence threshold for detecting a license from license text.
+# The higher the value, the more closely the license text must be to the
+# canonical license text of a valid SPDX license file.
+# [possible values: any between 0.0 and 1.0].
+confidence-threshold = 0.8
+# Allow 1 or more licenses on a per-crate basis, so that particular licenses
+# aren't accepted for every possible crate as with the normal allow list
+exceptions = [
+]
+
+
+# This section is considered when running `cargo deny check bans`.
+# More documentation about the 'bans' section can be found here:
+# https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html
+[bans]
+external-default-features = "allow"
+highlight = "all"
+multiple-versions = "deny"
+wildcards = "allow"
+workspace-default-features = "allow"
+
+# List of crates that are allowed. Use with care!
+allow = []
+
+# List of crates to deny:
+deny = [
+    "num",
+    # cargo-deny does not allow denying the rand crate while also skipping
+    # it for duplicate checks. While the ecosystem is split between 0.8 and 0.9,
+    # we need to prioritize allowing duplicate versions.
+    #{ crate = "rand", wrappers = [
+    #    "ipc-channel",
+    #    "phf_generator",
+    #    "quickcheck",
+    #    "servo_rand",
+    #    "tracing-perfetto",
+    #    "tungstenite",
+    #] },
+]
+
+# List of crates to skip for the duplicate check:
+skip = [
+    "bitflags",
+    "cookie",
+    "futures",
+    "redox_syscall",
+    "wayland-sys",
+
+    # Duplicated by aws-lc-rs
+    "bindgen",
+
+    # New versions of these dependencies is pulled in by GStreamer / GLib.
+    "itertools",
+    "toml",
+
+    # Duplicated by egui
+    "nix",
+    "windows-strings",
+
+    # Duplicated by egui-file-dialog
+    "windows",
+    "windows-implement",
+    "windows-interface",
+    "windows-result",
+
+    # Duplicated by winit.
+    "windows-sys",
+    "windows-targets",
+    "windows_aarch64_gnullvm",
+    "windows_aarch64_msvc",
+    "windows_i686_gnu",
+    "windows_i686_msvc",
+    "windows_x86_64_gnu",
+    "windows_x86_64_gnullvm",
+    "windows_x86_64_msvc",
+
+    # wgpu has the latest and greatest.
+    "foreign-types",
+    "foreign-types-shared",
+    "metal",
+    "windows-core",
+
+    # wgpu-hal depends on 0.5.0.
+    "ndk-sys",
+
+    # icu (from mozjs) uses old version
+    # tracing-subscriber (tokio-rs/tracing#3033) uses old version
+    # regex -> regex-automata 0.4.7
+    # icu_list -> regex-automata 0.2.0
+    # tracing-subscriber -> matchers -> regex-automata 0.1.0
+    "regex-automata",
+
+    # tracing-subscriber (tokio-rs/tracing#3033) uses old version
+    # regex [-> regex-automata 0.4.7] -> regex-syntax 0.8.4
+    # tracing-subscriber -> matchers -> regex-automata 0.1.0 -> regex-syntax 0.6.29
+    "regex-syntax",
+
+    # rust-content-security-policy uses newest base64.
+    "base64",
+
+    # gilrs is on 0.10.0, but Servo is still on 0.9.4
+    "core-foundation",
+
+    # wgpu crates still depend on 1.1.0
+    "rustc-hash",
+
+    # wgpu depends on thiserror 2, while rest is still on 1
+    "thiserror",
+    "thiserror-impl",
+
+    # duplicated by webdriver
+    "h2",
+    "headers",
+    "headers-core",
+    "http",
+    "http-body",
+    "hyper",
+
+    # duplicated by winit
+    "objc2-app-kit",
+    "objc2-foundation",
+    "objc2",
+
+    # duplicated by tungstenite
+    "getrandom",
+    "rand",
+    "rand_chacha",
+    "rand_core",
+    "wasi",
+    "webpki-roots",
+
+    # Stylo uses 2.0, WebRender uses 0.99
+    "derive_more",
+
+    # duplicated by blurz/blurmock
+    "hex",
+
+    # duplciated by rustix
+    "linux-raw-sys",
+
+    # duplicated by async-io
+    "rustix",
+
+    # duplicated by zbus-xml
+    "quick-xml",
+]
+
+# github.com organizations to allow git sources for
+[sources.allow-org]
+github = ["pcwalton", "servo", "linebender"]
