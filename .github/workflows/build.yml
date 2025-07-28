@@ -83,13 +83,40 @@ jobs:
 
     - name: Install Rust
       run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
     - name: Setup Rust toolchain
       run: |
         source $HOME/.cargo/env
-        rustup show
+        rustup override set nightly
+        rustup component add clippy rustfmt --toolchain nightly
+        rustc --version
+        cargo --version
+
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-registry-
+
+    - name: Cache cargo git dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-git-
+
+    - name: Cache target directory
+      uses: actions/cache@v4
+      with:
+        path: target
+        key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-target-
 
     - name: Bootstrap build environment
       run: |
