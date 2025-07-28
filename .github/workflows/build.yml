@@ -1,0 +1,104 @@
+name: Build Servo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: depot-ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          ccache \
+          clang \
+          cmake \
+          curl \
+          g++ \
+          git \
+          gperf \
+          libdbus-1-dev \
+          libfreetype6-dev \
+          libgl1-mesa-dri \
+          libgles2-mesa-dev \
+          libglib2.0-dev \
+          gstreamer1.0-plugins-good \
+          libgstreamer-plugins-good1.0-dev \
+          gstreamer1.0-plugins-bad \
+          libgstreamer-plugins-bad1.0-dev \
+          gstreamer1.0-plugins-ugly \
+          gstreamer1.0-plugins-base \
+          libgstreamer-plugins-base1.0-dev \
+          gstreamer1.0-libav \
+          libgstrtspserver-1.0-dev \
+          gstreamer1.0-tools \
+          libges-1.0-dev \
+          libharfbuzz-dev \
+          liblzma-dev \
+          libudev-dev \
+          libunwind-dev \
+          libvulkan1 \
+          libx11-dev \
+          libxcb-render0-dev \
+          libxcb-shape0-dev \
+          libxcb-xfixes0-dev \
+          libxmu-dev \
+          libxmu6 \
+          libegl1-mesa-dev \
+          llvm-dev \
+          m4 \
+          xorg-dev \
+          libxkbcommon0 \
+          libxkbcommon-x11-0 \
+          tshark \
+          python3 \
+          python3-pip
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Setup Rust toolchain
+      run: |
+        source $HOME/.cargo/env
+        rustup show
+
+    - name: Bootstrap build environment
+      run: |
+        source $HOME/.cargo/env
+        ./mach bootstrap
+
+    - name: Run tests
+      run: |
+        source $HOME/.cargo/env
+        ./mach test-unit
+
+    - name: Build Servo (release)
+      run: |
+        source $HOME/.cargo/env
+        ./mach build --release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: servo-binary
+        path: target/release/servo
+        retention-days: 7
