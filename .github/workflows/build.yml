@@ -1,0 +1,45 @@
+name: Build Zed
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_HOME: ${{ github.workspace }}/.cargo-home
+  RUSTUP_HOME: ${{ github.workspace }}/.rustup
+
+jobs:
+  build:
+    runs-on: depot-ubuntu-latest-8
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install system dependencies
+      run: |
+        ./script/linux
+
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+        echo "${{ github.workspace }}/.cargo-home/bin" >> $GITHUB_PATH
+
+    - name: Setup Rust toolchain
+      run: |
+        rustup show
+        rustc --version
+        cargo --version
+
+    - name: Run tests
+      continue-on-error: true
+      run: |
+        cargo test --workspace --lib --tests --no-fail-fast
+
+    - name: Build Zed (release)
+      run: |
+        cargo build --release
