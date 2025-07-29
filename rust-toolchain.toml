@@ -1,5 +1,5 @@
 [toolchain]
-channel = "1.88"
+channel = "nightly-2025-07-28"
 profile = "minimal"
 components = [ "rustfmt", "clippy" ]
 targets = [
