@@ -41,5 +41,7 @@ jobs:
         cargo test --workspace --lib --tests --no-fail-fast
 
     - name: Build Zed (release)
+      env:
+        RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
       run: |
         cargo build --release
