@@ -23,11 +23,6 @@ jobs:
     - name: Install system dependencies
       run: |
         ./script/linux
-        # Install mold if not already present
-        if ! command -v mold >/dev/null 2>&1; then
-          sudo apt-get update
-          sudo apt-get install -y mold
-        fi
 
     - name: Install Rust
       run: |
