@@ -1,0 +1,81 @@
+name: Build Zed
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: depot-ubuntu-latest-4
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          pkg-config \
+          libssl-dev \
+          libx11-dev \
+          libx11-xcb-dev \
+          libxcb-present-dev \
+          libxcb-composite0-dev \
+          libxcb-randr0-dev \
+          libxcb-shape0-dev \
+          libxcb-xfixes0-dev \
+          libxcb-xkb-dev \
+          libxcb-cursor-dev \
+          libxcb-dri3-dev \
+          libxcb-sync1 \
+          libxcb-keysyms1-dev \
+          libxcb-image0-dev \
+          libxcb-render-util0-dev \
+          libxcb-util-dev \
+          libxcb-icccm4-dev \
+          libxcb-ewmh-dev \
+          libxcb1-dev \
+          libxkbcommon-dev \
+          libxkbcommon-x11-dev \
+          libxrandr-dev \
+          libxi-dev \
+          libasound2-dev \
+          libgit2-dev \
+          libvulkan-dev \
+          clang
+
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Setup Rust toolchain
+      run: |
+        source $HOME/.cargo/env
+        rustup show
+        rustc --version
+        cargo --version
+
+    - name: Run tests
+      run: |
+        source $HOME/.cargo/env
+        cargo test --workspace
+
+    - name: Build Zed (release)
+      run: |
+        source $HOME/.cargo/env
+        cargo build --release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: zed-binary
+        path: target/release/zed
+        retention-days: 7
