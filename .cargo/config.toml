@@ -6,10 +6,10 @@ rustflags = ["-C", "symbol-mangling-version=v0", "--cfg", "tokio_unstable"]
 xtask = "run --package xtask --"
 
 [target.x86_64-unknown-linux-gnu]
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+rustflags = ["-C", "link-arg=-fuse-ld=mold", "-Z", "threads=8", "-Z", "share-generics=y"]
 
 [target.aarch64-unknown-linux-gnu]
-rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+rustflags = ["-C", "link-arg=-fuse-ld=mold", "-Z", "threads=8", "-Z", "share-generics=y"]
 
 [target.'cfg(target_os = "windows")']
 rustflags = [
