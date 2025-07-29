@@ -1,0 +1,14 @@
+[alias]
+build-man = "run --package xtask-build-man --"
+stale-label = "run --package xtask-stale-label --"
+bump-check = "run --package xtask-bump-check --"
+lint-docs = "run --package xtask-lint-docs --"
+
+[env]
+# HACK: Until this is stabilized, `snapbox`s polyfill could get confused
+# inside of the rust-lang/rust repo because it looks for the furthest-away `Cargo.toml`
+CARGO_RUSTC_CURRENT_DIR = { value = "", relative = true }
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]
