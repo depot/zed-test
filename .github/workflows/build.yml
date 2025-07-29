@@ -1,0 +1,69 @@
+name: Build Cargo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: depot-ubuntu-latest-8
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          pkg-config \
+          libssl-dev \
+          clang \
+          mold
+
+    - name: Install Rust
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Setup Rust toolchain
+      run: |
+        source $HOME/.cargo/env
+        rustup show
+        rustup component add rustc-codegen-cranelift-preview --toolchain nightly-2025-07-28-x86_64-unknown-linux-gnu
+        rustc --version
+        cargo --version
+
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Run tests
+      run: |
+        source $HOME/.cargo/env
+        cargo test --workspace
+
+    - name: Build Cargo (release)
+      run: |
+        source $HOME/.cargo/env
+        cargo build --release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: cargo-binary
+        path: target/release/cargo
+        retention-days: 7
