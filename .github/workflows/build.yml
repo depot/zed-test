@@ -23,13 +23,11 @@ jobs:
         sudo apt-get install -y \
           build-essential \
           pkg-config \
-          libssl-dev \
-          clang \
-          mold
+          libssl-dev
 
     - name: Install Rust
       run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
     - name: Setup Rust toolchain
@@ -38,17 +36,6 @@ jobs:
         rustup show
         rustc --version
         cargo --version
-
-    - name: Cache cargo dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-
 
     - name: Run tests
       run: |
