@@ -36,7 +36,6 @@ jobs:
       run: |
         source $HOME/.cargo/env
         rustup show
-        rustup component add rustc-codegen-cranelift-preview --toolchain nightly-2025-07-28-x86_64-unknown-linux-gnu
         rustc --version
         cargo --version
 

@@ -278,3 +278,5 @@ all-static = ['vendored-openssl', 'curl/static-curl', 'curl/force-system-lib-on-
 [lints]
 workspace = true
 
+[profile.test]
+codegen-backend = "cranelift"
