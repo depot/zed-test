@@ -8,6 +8,12 @@ xtask = "run --package xtask --"
 # Mold linker configuration removed from here
 # Will be set via RUSTFLAGS environment variable for tests only
 
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-Z", "threads=8", "-Z", "share-generics=y"]
+
+[target.aarch64-unknown-linux-gnu]
+rustflags = ["-Z", "threads=8", "-Z", "share-generics=y"]
+
 [target.'cfg(target_os = "windows")']
 rustflags = [
     "--cfg",
