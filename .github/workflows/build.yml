@@ -55,6 +55,7 @@ jobs:
       continue-on-error: true
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
+        CARGO_PROFILE_TEST_CODEGEN_BACKEND: cranelift
       run: |
         depot cargo test --workspace --lib --tests --no-fail-fast
 
