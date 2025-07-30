@@ -35,6 +35,17 @@ jobs:
         rustc --version
         cargo --version
 
+    - name: Cache cargo dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/.cargo-home/registry/index/
+          ${{ github.workspace }}/.cargo-home/registry/cache/
+          ${{ github.workspace }}/.cargo-home/git/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
     - name: Run tests
       continue-on-error: true
       env:
