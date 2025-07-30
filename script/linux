@@ -46,6 +46,7 @@ if [[ -n $apt ]]; then
     musl-tools
     musl-dev
     build-essential
+    sccache
   )
   if (grep -qP 'PRETTY_NAME="(Linux Mint 22|.+24\.(04|10))' /etc/os-release); then
     deps+=( mold libstdc++-14-dev )
@@ -85,6 +86,7 @@ if [[ -n $dnf ]] || [[ -n $yum ]]; then
     jq
     git
     tar
+    sccache
   )
   # perl used for building openssl-sys crate. See: https://docs.rs/openssl/latest/openssl/
   if grep -qP '^ID="?(fedora)' /etc/os-release; then
@@ -154,6 +156,7 @@ if [[ -n $zyp ]]; then
     tar
     wayland-devel
     xcb-util-devel
+    sccache
   )
   $maysudo "$zyp" install -y "${deps[@]}"
   finalize
@@ -182,6 +185,7 @@ if [[ -n $pacman ]]; then
     sqlite
     jq
     git
+    sccache
   )
   $maysudo "$pacman" -Syu --needed --noconfirm "${deps[@]}"
   finalize
@@ -209,6 +213,7 @@ if [[ -n $xbps ]]; then
     vulkan-loader
     mold
     sqlite-devel
+    sccache
   )
   $maysudo "$xbps" -Syu "${deps[@]}"
   finalize
@@ -232,6 +237,7 @@ if [[ -n $emerge ]]; then
     x11-libs/libxkbcommon
     sys-devel/mold
     dev-db/sqlite
+    dev-util/sccache
   )
   $maysudo "$emerge" -u "${deps[@]}"
   finalize

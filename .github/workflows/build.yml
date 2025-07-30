@@ -29,6 +29,14 @@ jobs:
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
         echo "${{ github.workspace }}/.cargo-home/bin" >> $GITHUB_PATH
 
+    - name: Install depot CLI
+      run: |
+        curl -fsSL https://depot.dev/install.sh | sh
+        echo "$HOME/.depot/bin" >> $GITHUB_PATH
+
+    - name: Run sccache-cache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
     - name: Setup Rust toolchain
       run: |
         rustup show
@@ -50,11 +58,13 @@ jobs:
       continue-on-error: true
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold -Z share-generics=y -Z threads=8"
+        SCCACHE_GHA_ENABLED: true
       run: |
-        cargo test --workspace --lib --tests --no-fail-fast
+        depot cargo test --workspace --lib --tests --no-fail-fast
 
     - name: Build Zed (release)
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold -Z share-generics=y -Z threads=8"
+        SCCACHE_GHA_ENABLED: true
       run: |
-        cargo build --release
+        depot cargo build --release
