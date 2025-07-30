@@ -1,3 +1,5 @@
+cargo-features = ["codegen-backend"]
+
 [workspace]
 resolver = "2"
 members = [
@@ -788,6 +790,8 @@ inherits = "release"
 debug = "full"
 lto = false
 codegen-units = 16
+[profile.test]
+codegen-backend = "cranelift"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "allow" }
