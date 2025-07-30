@@ -29,6 +29,11 @@ jobs:
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
         echo "${{ github.workspace }}/.cargo-home/bin" >> $GITHUB_PATH
 
+    - name: Install depot CLI
+      run: |
+        curl -fsSL https://depot.dev/install.sh | sh
+        echo "$HOME/.depot/bin" >> $GITHUB_PATH
+
     - name: Setup Rust toolchain
       run: |
         rustup show
@@ -51,10 +56,10 @@ jobs:
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
       run: |
-        cargo test --workspace --lib --tests --no-fail-fast
+        depot cargo test --workspace --lib --tests --no-fail-fast
 
     - name: Build Zed (release)
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
       run: |
-        cargo build --release
+        depot cargo build --release
