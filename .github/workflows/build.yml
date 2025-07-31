@@ -37,6 +37,10 @@ jobs:
     - name: Run sccache-cache
       uses: mozilla-actions/sccache-action@v0.0.7
 
+    - name: Install cargo-nextest
+      run: |
+        curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+
     - name: Setup Rust toolchain
       run: |
         rustup show
@@ -56,11 +60,12 @@ jobs:
 
     - name: Run tests
       continue-on-error: true
+      timeout-minutes: 60
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
         SCCACHE_GHA_ENABLED: true
       run: |
-        depot cargo test --workspace --lib --tests --no-fail-fast
+        depot cargo nextest run --workspace --no-fail-fast
 
     - name: Build Zed (release)
       env:
