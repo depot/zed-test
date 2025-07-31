@@ -34,6 +34,10 @@ jobs:
         curl -fsSL https://depot.dev/install.sh | sh
         echo "$HOME/.depot/bin" >> $GITHUB_PATH
 
+    - name: Install cargo-nextest
+      run: |
+        curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+
     - name: Setup Rust toolchain
       run: |
         rustup show
@@ -53,10 +57,11 @@ jobs:
 
     - name: Run tests
       continue-on-error: true
+      timeout-minutes: 60
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
       run: |
-        depot cargo test --workspace --lib --tests --no-fail-fast
+        depot cargo nextest run --workspace --no-fail-fast
 
     - name: Build Zed (release)
       run: |
