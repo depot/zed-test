@@ -23,11 +23,9 @@ jobs:
     - name: Install system dependencies
       run: |
         ./script/linux
-        # Install mold if not already present
-        if ! command -v mold >/dev/null 2>&1; then
-          sudo apt-get update
-          sudo apt-get install -y mold
-        fi
+        # Install mold and sccache
+        sudo apt-get update
+        sudo apt-get install -y mold sccache
 
     - name: Install Rust
       run: |
@@ -39,9 +37,9 @@ jobs:
         curl -fsSL https://depot.dev/install.sh | sh
         echo "$HOME/.depot/bin" >> $GITHUB_PATH
 
-    - name: Install sccache
+    - name: Install cargo-nextest
       run: |
-        cargo install --locked sccache
+        cargo install --locked cargo-nextest
 
     - name: Setup Rust toolchain
       run: |
@@ -62,8 +60,9 @@ jobs:
 
     - name: Run tests
       continue-on-error: true
+      timeout-minutes: 60
       run: |
-        depot cargo test --workspace --lib --tests --no-fail-fast
+        depot cargo nextest run --workspace --no-fail-fast
 
     - name: Build Zed (release)
       run: |
