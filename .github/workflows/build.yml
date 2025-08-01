@@ -20,6 +20,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@v0.0.7
+
       - name: Install system dependencies
         run: |
           ./script/linux
@@ -50,13 +53,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
-
-      - run: |
-          cargo install sccache
-
-      - uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: false
 
       - name: Run tests
         continue-on-error: true
