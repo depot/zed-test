@@ -58,8 +58,6 @@ jobs:
     - name: Run tests
       continue-on-error: true
       timeout-minutes: 60
-      env:
-        RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
       run: |
         depot cargo nextest run --workspace --no-fail-fast
 
