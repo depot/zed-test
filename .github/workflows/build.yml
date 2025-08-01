@@ -12,52 +12,56 @@ env:
 jobs:
   build:
     runs-on: depot-ubuntu-latest-8
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-    - name: Install system dependencies
-      run: |
-        ./script/linux
+      - name: Install system dependencies
+        run: |
+          ./script/linux
 
-    - name: Install Rust
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
-        echo "${{ github.workspace }}/.cargo-home/bin" >> $GITHUB_PATH
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly
+          echo "${{ github.workspace }}/.cargo-home/bin" >> $GITHUB_PATH
 
-    - name: Install depot CLI
-      run: |
-        curl -fsSL https://depot.dev/install.sh | sh
-        echo "$HOME/.depot/bin" >> $GITHUB_PATH
+      - name: Install depot CLI
+        run: |
+          curl -fsSL https://depot.dev/install.sh | sh
+          echo "$HOME/.depot/bin" >> $GITHUB_PATH
 
-    - name: Setup Rust toolchain
-      run: |
-        rustup show
-        rustc --version
-        cargo --version
+      - name: Setup Rust toolchain
+        run: |
+          rustup show
+          rustc --version
+          cargo --version
 
-    - name: Cache cargo dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ${{ github.workspace }}/.cargo-home/registry/index/
-          ${{ github.workspace }}/.cargo-home/registry/cache/
-          ${{ github.workspace }}/.cargo-home/git/
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-cargo-
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.cargo-home/registry/index/
+            ${{ github.workspace }}/.cargo-home/registry/cache/
+            ${{ github.workspace }}/.cargo-home/git/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
-    - name: Run tests
-      continue-on-error: true
-      env:
-        RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
-      run: |
-        depot cargo test --workspace --lib --tests --no-fail-fast
+      - uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: false
 
-    - name: Build Zed (release)
-      run: |
-        depot cargo build --release
+      - name: Run tests
+        continue-on-error: true
+        env:
+          RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
+        run: |
+          depot cargo test --workspace --lib --tests --no-fail-fast
+
+      - name: Build Zed (release)
+        run: |
+          depot cargo build --release
