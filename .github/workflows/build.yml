@@ -34,6 +34,9 @@ jobs:
         curl -fsSL https://depot.dev/install.sh | sh
         echo "$HOME/.depot/bin" >> $GITHUB_PATH
 
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.9
+
     - name: Setup Rust toolchain
       run: |
         rustup show
@@ -55,9 +58,12 @@ jobs:
       continue-on-error: true
       env:
         RUSTFLAGS: "-C link-arg=-fuse-ld=mold"
+        SCCACHE_GHA_ENABLED: "true"
       run: |
         depot cargo test --workspace --lib --tests --no-fail-fast
 
     - name: Build Zed (release)
+      env:
+        SCCACHE_GHA_ENABLED: "true"
       run: |
         depot cargo build --release
