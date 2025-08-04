@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    runs-on: depot-ubuntu-latest-8
+    runs-on: depot-ubuntu-latest-16
     
     steps:
     - name: Checkout code
